@@ -16,6 +16,8 @@ function App() {
   const [filters, setFilters] = useState({
     status: "alle",
     area: "alle",
+    payment: "alle",
+    productType: "alle",
     search: "",
     sort: "newest"
   });
@@ -30,14 +32,23 @@ function App() {
       modtaget: 0,
       bekraeftet: 0,
       afvist: 0,
-      mangler_svar: 0
+      mangler_svar: 0,
+      betalt: 0
     };
     for (const item of stallholders) {
       if (Object.prototype.hasOwnProperty.call(base, item.status)) {
         base[item.status] += 1;
       }
+      if (item.betalingsstatus === "betalt") {
+        base.betalt += 1;
+      }
     }
     return base;
+  }, [stallholders]);
+
+  const productTypeOptions = useMemo(() => {
+    const unique = new Set(stallholders.map((item) => item.produkttype).filter(Boolean));
+    return [...unique].sort((a, b) => a.localeCompare(b, "da"));
   }, [stallholders]);
 
   const filteredStallholders = useMemo(() => {
@@ -50,9 +61,15 @@ function App() {
     if (filters.area !== "alle") {
       list = list.filter((item) => item.tildeltOmrade === filters.area);
     }
+    if (filters.payment !== "alle") {
+      list = list.filter((item) => item.betalingsstatus === filters.payment);
+    }
+    if (filters.productType !== "alle") {
+      list = list.filter((item) => item.produkttype === filters.productType);
+    }
     if (query) {
       list = list.filter((item) => {
-        const blob = `${item.navn} ${item.virksomhed} ${item.produkttype}`.toLowerCase();
+        const blob = `${item.navn} ${item.virksomhed} ${item.cvr} ${item.produkttype}`.toLowerCase();
         return blob.includes(query);
       });
     }
@@ -73,6 +90,23 @@ function App() {
     [selectedId, stallholders]
   );
 
+  const selectedPlacementConflict = useMemo(() => {
+    if (!selectedStallholder) return null;
+
+    const isWineType = selectedStallholder.produkttype.toLowerCase().includes("vin");
+    if (!isWineType || !selectedStallholder.tildeltOmrade) return null;
+
+    const inSameAreaWine = stallholders.filter(
+      (item) =>
+        item.id !== selectedStallholder.id &&
+        item.tildeltOmrade === selectedStallholder.tildeltOmrade &&
+        item.produkttype.toLowerCase().includes("vin")
+    );
+
+    if (!inSameAreaWine.length) return null;
+    return `Mulig konflikt: Der er allerede ${inSameAreaWine.length} anden vinhandler i ${selectedStallholder.tildeltOmrade}.`;
+  }, [selectedStallholder, stallholders]);
+
   function updateItem(id, patch) {
     setStallholders((prev) =>
       prev.map((item) =>
@@ -89,12 +123,21 @@ function App() {
       virksomhed: formData.virksomhed,
       email: formData.email,
       telefon: formData.telefon,
+      cvr: formData.cvr,
       produkttype: formData.produkttype,
+      erNyStadeholder: formData.erNyStadeholder,
+      hjemmeside: formData.hjemmeside,
+      produktbeskrivelse: formData.produktbeskrivelse,
       onsketOmrade: formData.onsketOmrade,
       tildeltOmrade: formData.onsketOmrade,
+      standnummer: "",
+      fastPlacering: false,
       sarligeOnsker: formData.sarligeOnsker,
+      ankomstdag: formData.ankomstdag,
       behov: formData.behov,
       kommentarer: formData.kommentarer,
+      betalingsstatus: "faktura_mangler",
+      tidligerePlaceringNote: "",
       interneNoter: "",
       status: "modtaget",
       createdAt: now,
@@ -140,14 +183,18 @@ function App() {
           <AdminDashboard
             stats={stats}
             filters={filters}
+            productTypeOptions={productTypeOptions}
             onFilterChange={handleFilterChange}
             filteredStallholders={filteredStallholders}
             selectedId={selectedId}
             onSelect={setSelectedId}
             selectedStallholder={selectedStallholder}
+            selectedPlacementConflict={selectedPlacementConflict}
             onUpdateStatus={(id, status) => updateItem(id, { status })}
             onUpdateArea={(id, tildeltOmrade) => updateItem(id, { tildeltOmrade })}
-            onUpdateNotes={(id, interneNoter) => updateItem(id, { interneNoter })}
+            onUpdatePaymentStatus={(id, betalingsstatus) => updateItem(id, { betalingsstatus })}
+            onUpdateStandInfo={(id, patch) => updateItem(id, patch)}
+            onUpdateNotes={(id, patch) => updateItem(id, patch)}
             onResetData={handleResetData}
           />
         ) : null}

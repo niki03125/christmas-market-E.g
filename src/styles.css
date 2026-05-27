@@ -229,6 +229,9 @@ fieldset {
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 0.7rem;
 }
+.filters--wide {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
 
 .table-wrap {
   border: 1px solid var(--border);
@@ -319,6 +322,37 @@ tbody tr:hover {
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+
+.warning {
+  background: #fff3cd;
+  border: 1px solid #f0d58a;
+  color: #6e550d;
+  border-radius: 10px;
+  padding: 0.6rem 0.75rem;
+}
+
+.inline-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.panel--subtle {
+  background: #fff;
+  margin-top: 1.2rem;
+}
+
+.faq-list {
+  margin: 0;
+  padding-left: 1rem;
+  display: grid;
+  gap: 0.35rem;
+}
+
+.checklist-box ul {
+  margin: 0.5rem 0 0;
+  padding-left: 1.1rem;
 }
 
 .preview-grid {

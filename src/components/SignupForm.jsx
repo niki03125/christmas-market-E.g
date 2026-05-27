@@ -6,9 +6,14 @@ const emptyForm = {
   virksomhed: "",
   email: "",
   telefon: "",
+  cvr: "",
   produkttype: "",
+  erNyStadeholder: "genganger",
+  hjemmeside: "",
+  produktbeskrivelse: "",
   onsketOmrade: AREAS[0],
   sarligeOnsker: "",
+  ankomstdag: "torsdag",
   kommentarer: "",
   behov: { borde: false, stole: false, strom: false }
 };
@@ -70,6 +75,17 @@ function SignupForm({ onSubmit }) {
           <input required name="telefon" value={form.telefon} onChange={handleChange} />
         </label>
         <label>
+          CVR
+          <input required name="cvr" value={form.cvr} onChange={handleChange} />
+        </label>
+        <label>
+          Ny stadeholder?
+          <select name="erNyStadeholder" value={form.erNyStadeholder} onChange={handleChange}>
+            <option value="genganger">Genganger</option>
+            <option value="ny">Ny stadeholder</option>
+          </select>
+        </label>
+        <label>
           Type af bod eller produkt
           <input
             required
@@ -90,6 +106,28 @@ function SignupForm({ onSubmit }) {
                 {area}
               </option>
             ))}
+          </select>
+        </label>
+        <label className="full">
+          Hjemmeside eller link (isaar for nye)
+          <input name="hjemmeside" value={form.hjemmeside} onChange={handleChange} />
+        </label>
+        <label className="full">
+          Produktbeskrivelse
+          <textarea
+            required
+            name="produktbeskrivelse"
+            value={form.produktbeskrivelse}
+            onChange={handleChange}
+            rows={3}
+          />
+        </label>
+        <label>
+          Onsket ankomstdag
+          <select name="ankomstdag" value={form.ankomstdag} onChange={handleChange}>
+            <option value="onsdag">Onsdag</option>
+            <option value="torsdag">Torsdag</option>
+            <option value="anden">Anden aftale</option>
           </select>
         </label>
         <label className="full">
@@ -149,6 +187,16 @@ function SignupForm({ onSubmit }) {
         </div>
       </form>
       {success ? <p className="success">{success}</p> : null}
+
+      <article className="panel panel--subtle">
+        <h3>Praktisk info og FAQ</h3>
+        <ul className="faq-list">
+          <li>Du far besked om placering (omrade og standnummer), sa snart planen er klar.</li>
+          <li>Skriv i formularen, hvis du har brug for borde eller andet udstyr.</li>
+          <li>Har du behov for ankomst onsdag, sa vaelg det i feltet for ankomstdag.</li>
+          <li>Onske om anden placering behandles loebende og afhaenger af den samlede plan.</li>
+        </ul>
+      </article>
     </section>
   );
 }

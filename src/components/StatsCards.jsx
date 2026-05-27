@@ -14,8 +14,8 @@ function StatsCards({ stats }) {
         <h3>{stats.mangler_svar}</h3>
       </article>
       <article className="stat-card">
-        <p>Afviste</p>
-        <h3>{stats.afvist}</h3>
+        <p>Betalt</p>
+        <h3>{stats.betalt}</h3>
       </article>
     </div>
   );
